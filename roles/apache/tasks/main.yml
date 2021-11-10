@@ -1,0 +1,44 @@
+---
+- name: install unzip
+  apt:
+     name: unzip
+     state: latest
+
+- name: install apache server
+  apt:
+     name: "{{ apache2 }}"
+     state: latest
+  
+- name: "UFW firewall allow HTTP on port 80"
+  ufw:
+    rule: allow
+    port: "80"
+    proto: tcp
+
+- name: "UFW firewall allow HTTP on port 443"
+  ufw:
+    rule: allow
+    port: "443"
+    proto: tcp
+
+
+- name: restart apache
+  ansible.builtin.systemd:
+     name: apache2
+     state: restarted
+
+- name: upload config file wordpress.conf
+  ansible.builtin.copy:
+    src: "{{ wp_config }}"
+    dest: "{{ wp_config_dest }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: rewrite mod
+  shell: |
+     systemctl restart apache2
+     a2ensite wordpress.conf
+     a2dissite 000-default.conf
+     systemctl reload apache2
+

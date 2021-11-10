@@ -1,0 +1,71 @@
+---
+- name: download wpcli
+  get_url:
+     url: "{{ wp_cli_url }}"
+     dest: "{{ wp_cli_dest }}"
+
+- name: Change file permissions
+  ansible.builtin.file:
+    path: "{{ wp_cli_dest }}"
+    mode: '0755'
+
+- name: create dir wordpress
+  ansible.builtin.file:
+    path: "{{ wp_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: find wordpress folder
+  find: 
+    paths: "{{ wp_dir }}"
+    patterns: "wp-admin"
+    file_type: directory
+    recurse: false 
+  register: out
+
+- name: install wordpress
+  shell: wp core download --path="{{ wp_dir }}" --allow-root
+  when: out.files | length == 0
+      
+- name: Copy config files
+  ansible.builtin.copy:
+    src: "{{ wp_config_src }}"
+    dest: "{{ wp_dir }}"
+    owner: root
+    group: root
+    mode: '0644' 
+
+- name: Download wp-plugin
+  get_url:
+    url: "{{ wp_plugin_url }}"
+    dest: "{{ wp_plugin_dest }}"
+
+- name: Unarchive a file with plugin wp
+  ansible.builtin.unarchive:
+    src: "{{ wp_plugin_url }}"
+    dest: "{{ wp_plugin_dest }}"
+    remote_src: yes
+
+- name: Copy config file db.php
+  ansible.builtin.copy:
+    src: "{{ db_path }}"
+    dest: "{{ wp_content }}"
+
+- name: Remove archive 
+  ansible.builtin.file:
+    path: "{{ index_html }}"
+    state: absent
+
+
+- name: Check that you can connect (GET) to a page and it returns a status 200
+  uri:
+    url: "http://{{ groups['apache_server'][0] }}/wp-admin/install.php"
+    return_content: yes
+  register: out
+
+
+- name: end install wp
+  shell: wp core install --url="{{ groups['apache_server'][0] }}"  --title="{{ title }}" --admin_user="{{ user }}" --admin_password="{{ password }}" --admin_email="{{ email }}" --allow-root --path="{{ wp_dir }}"
+  when: out.status == 200
+  no_log: true
+

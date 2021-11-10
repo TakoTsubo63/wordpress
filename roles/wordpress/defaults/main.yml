@@ -1,0 +1,23 @@
+#wp cli url 
+wp_cli_url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+#dest to wp cli
+wp_cli_dest: /usr/local/bin/wp
+#wp_dir create
+wp_dir: /var/www/html/wordpress
+#wp_config_src
+wp_config_src: /root/.jenkins/workspace/install-apache/roles/wordpress/files/wp-config.php
+#wp_plugin_ur download
+wp_plugin_url: https://downloads.wordpress.org/plugin/wppg.1.0.1.zip
+#wp_plugin_dest folder
+wp_plugin_dest: /var/www/html/wordpress/wp-content/plugins/
+#db_path in wp folder
+db_path: /root/.jenkins/workspace/install-apache/roles/wordpress/files/db.php
+#wp_content folder
+wp_content: /var/www/html/wordpress/wp-content/
+#index_html file
+index_html: /var/www/html/index.html
+######################################
+#config wp admin
+######################################
+#title
+title: samplesite

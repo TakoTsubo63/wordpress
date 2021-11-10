@@ -1,0 +1,6 @@
+#apache2 install 
+apache2: apache2
+#wp config path in jenkins
+wp_config: /root/.jenkins/workspace/install-apache/roles/apache/files/wordpress.conf
+#dest of wp-conf
+wp_config_dest: /etc/apache2/sites-available/

@@ -1,0 +1,10 @@
+---
+- name: install wordpress
+  hosts: all
+  become: true
+
+  roles:
+    - defaultjdk
+    - apache
+    - php
+    - wordpress

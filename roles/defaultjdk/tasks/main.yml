@@ -1,0 +1,6 @@
+---
+- name: install default-jdk
+  apt:
+     update_cache: yes
+     name: "{{ packages }}"
+     state: latest

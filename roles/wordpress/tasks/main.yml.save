@@ -1,0 +1,65 @@
+---
+- name: Download wp archive
+  get_url:
+    url: https://wordpress.org/latest.tar.gz
+    dest: /var/www/html/
+
+
+- name: Unarchive a file that needs to be downloaded (added in 2.0)
+  ansible.builtin.unarchive:
+    src: https://wordpress.org/latest.tar.gz
+    dest: /var/www/html/
+    remote_src: yes
+
+- name: remove archive 
+  shell: |
+        rm -rf /var/www/html/*.gz
+        rm -rf /var/www/html/wordpress/wp-config-sample.php
+
+- name: Copy config files
+  ansible.builtin.copy:
+    src: /home/ec2-user/apache/wordpress/files/wp-config.php
+    dest: /var/www/html/wordpress
+    owner: root
+    group: root
+    mode: '0644' 
+
+- name: change mode
+  shell: |
+     chown -R www-data:www-data /var/www/html/wordpress
+     find /var/www/html/wordpress/ -type d -exec chmod 750 {} \;
+     find /var/www/html/wordpress/ -type f -exec chmod 640 {} \;
+
+- name: Copy config file .htaccess
+  ansible.builtin.copy:
+    src: /home/ec2-user/apache/wordpress/files/.htaccess
+    dest: /var/www/html/wordpress
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Download wp-plugin
+  get_url:
+    url: https://downloads.wordpress.org/plugin/wppg.1.0.1.zip
+    dest: /var/www/html/wordpress/wp-content/plugins/
+
+- name: Unarchive a file with plugin wp
+  ansible.builtin.unarchive:
+    src: https://downloads.wordpress.org/plugin/wppg.1.0.1.zip
+    dest: /var/www/html/wordpress/wp-content/plugins/
+    remote_src: yes
+
+- name: remove archive
+  shell: |
+        rm -rf /var/www/html/wordpress/wp-content/plugins/*.zip
+
+- name: Copy config file db.php
+  ansible.builtin.copy:
+    src: /home/ec2-user/apache/wordpress/files/db.php
+    dest: /var/www/html/wordpress/wp-content/
+
+- name: changed wp-config.php
+  ansible.builtin.lineinfile:
+     path: /var/www/html/wordpress/wp-config.php
+     regexp: 'change_this'
+     line: ''
